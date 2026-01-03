@@ -10,9 +10,13 @@ export function Screen2Acknowledgment({ onContinue }: Screen2AcknowledgmentProps
   const [isAnimating, setIsAnimating] = useState(true)
 
   const lines = [
-    'Eu cometi um erro.',
-    'Isso foi real. Isso importou.',
-    'E você merecia melhor.',
+    'eu traí a sua confiança',
+    'isso não aconteceu por falta de amor',
+    'nem por confusão',
+    'nem por momento difícil',
+    'aconteceu porque eu fiz uma escolha errada',
+    'e não existe justificativa nenhuma',
+    'que diminua isso',
   ]
 
   return (

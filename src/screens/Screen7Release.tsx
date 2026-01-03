@@ -10,9 +10,17 @@ export function Screen7Release({ onContinue }: Screen7ReleaseProps) {
   const [isAnimating, setIsAnimating] = useState(true)
 
   const lines = [
-    'Você não precisa me perdoar.',
-    'Você não precisa responder.',
-    'Você é livre.',
+    'você não me deve resposta',
+    'nem explicação',
+    'nem perdão',
+    'não precisa carregar',
+    'nenhuma expectativa',
+    'nenhuma obrigação',
+    'o que vier depois disso',
+    'se vier',
+    'precisa ser leve',
+    'e se não vier',
+    'também está tudo bem',
   ]
 
   return (

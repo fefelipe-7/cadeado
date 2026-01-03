@@ -121,8 +121,11 @@ export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
             <h2 className="text-white/80 text-2xl mb-2 text-center font-light">
               Cartas
             </h2>
-            <p className="text-white/50 text-sm text-center mb-8">
-              Expressões, não negociações
+            <p className="text-white/50 text-sm text-center mb-4 font-light">
+              essas cartas não são negociação, não são tentativa, nem promessa, são apenas palavras que precisavam ter um lugar
+            </p>
+            <p className="text-white/40 text-xs text-center mb-8 font-light">
+              se você quiser escrever algo, isso será lido por mim, sem expectativa de resposta, sem pressão, no seu tempo
             </p>
 
             <div className="space-y-3 mb-8">

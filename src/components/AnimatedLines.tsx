@@ -11,13 +11,13 @@ interface AnimatedLinesProps {
 export function AnimatedLines({
   lines,
   onAnimationComplete,
-  delayBetweenLines = 0.5,
-  initialDelay = 0.4,
+  delayBetweenLines = 0.3,
+  initialDelay = 0.2,
 }: AnimatedLinesProps) {
 
   useEffect(() => {
     const totalDuration =
-      initialDelay + lines.length * delayBetweenLines + 1.0
+      initialDelay + lines.length * delayBetweenLines + 0.6
     const timer = setTimeout(() => {
       onAnimationComplete?.()
     }, totalDuration * 1000)
@@ -33,7 +33,7 @@ export function AnimatedLines({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            duration: 1.0,
+            duration: 0.6,
             delay: initialDelay + index * delayBetweenLines,
             ease: 'easeOut',
           }}

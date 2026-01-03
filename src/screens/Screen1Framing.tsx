@@ -10,9 +10,13 @@ export function Screen1Framing({ onContinue }: Screen1FramingProps) {
   const [isAnimating, setIsAnimating] = useState(true)
 
   const lines = [
-    'Este é um espaço para você.',
-    'Um lugar para refletir sobre o que aconteceu.',
-    'Sem pressa. Sem julgamento.',
+    'isso não é um pedido',
+    'nem uma tentativa de convencer',
+    'não é pra reabrir nada',
+    'nem pra mudar decisões',
+    'é só um espaço',
+    'criado com cuidado',
+    'pra dizer o que ficou',
   ]
 
   return (

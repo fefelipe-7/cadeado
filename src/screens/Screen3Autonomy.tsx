@@ -10,9 +10,13 @@ export function Screen3Autonomy({ onContinue }: Screen3AutonomyProps) {
   const [isAnimating, setIsAnimating] = useState(true)
 
   const lines = [
-    'Você é uma pessoa completa.',
-    'Suas escolhas são suas.',
-    'Eu não tenho direito sobre você.',
+    'quando você terminou',
+    'não foi exagero',
+    'nem impulso',
+    'foi uma forma de se proteger',
+    'de algo que te feriu',
+    'isso foi um direito seu',
+    'e eu respeito essa decisão',
   ]
 
   return (

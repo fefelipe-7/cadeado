@@ -10,9 +10,15 @@ export function Screen4Impact({ onContinue }: Screen4ImpactProps) {
   const [isAnimating, setIsAnimating] = useState(true)
 
   const lines = [
-    'Eu vejo o que minha ação causou.',
-    'A dor que você sentiu era real.',
-    'Isso não pode ser desfeito com palavras.',
+    'eu sei que o que aconteceu',
+    'não machuca só o momento',
+    'machuca a forma de confiar',
+    'a forma de se sentir segura',
+    'a forma de olhar para alguém',
+    'eu assumo esse impacto',
+    'mesmo sabendo que ele',
+    'não pode ser desfeito',
+    'mas com você...',
   ]
 
   return (
