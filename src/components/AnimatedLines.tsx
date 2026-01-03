@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 interface AnimatedLinesProps {
   lines: string[]
@@ -19,7 +19,6 @@ export function AnimatedLines({
     const totalDuration =
       initialDelay + lines.length * delayBetweenLines + 0.6
     const timer = setTimeout(() => {
-      setIsComplete(true)
       onAnimationComplete?.()
     }, totalDuration * 1000)
 
