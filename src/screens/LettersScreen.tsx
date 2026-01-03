@@ -12,12 +12,11 @@ interface Letter {
 
 interface LettersScreenProps {
   onExit?: () => void
-  sessionId?: string
 }
 
 type View = 'list' | 'read' | 'compose'
 
-export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
+export function LettersScreen({ onExit }: LettersScreenProps) {
   const [letters, setLetters] = useState<Letter[]>([])
   const [view, setView] = useState<View>('list')
   const [selectedLetterId, setSelectedLetterId] = useState<string | null>(null)
@@ -30,14 +29,9 @@ export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
 
   useEffect(() => {
     loadLetters()
-  }, [sessionId])
+  }, [])
 
   const loadLetters = async () => {
-    if (!sessionId) {
-      setLoading(false)
-      return
-    }
-
     try {
       setLoading(true)
       setError(null)
@@ -45,15 +39,14 @@ export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
       const { data, error: err } = await supabase
         .from('letters')
         .select('*')
-        .eq('session_id', sessionId)
         .order('created_at', { ascending: true })
 
       if (err) throw err
 
       const formattedLetters: Letter[] = (data || []).map((letter: any) => ({
         id: letter.id,
-        from: letter.author === 'author' ? 'fefe' : 'nana',
-        to: letter.author === 'author' ? 'nana' : 'fefe',
+        from: letter.author,
+        to: letter.author === 'fefe' ? 'nana' : 'fefe',
         content: letter.content,
         timestamp: new Date(letter.created_at).getTime(),
       }))
@@ -70,10 +63,6 @@ export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
 
   const handleCompose = async () => {
     if (!composeContent.trim()) return
-    if (!sessionId) {
-      setError('Sessão não encontrada')
-      return
-    }
 
     try {
       setError(null)
@@ -81,8 +70,7 @@ export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
       const { data, error: err } = await supabase
         .from('letters')
         .insert({
-          session_id: sessionId,
-          author: composeFrom === 'fefe' ? 'author' : 'recipient',
+          author: composeFrom,
           content: composeContent,
         })
         .select()

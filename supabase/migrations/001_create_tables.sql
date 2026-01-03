@@ -30,25 +30,23 @@ COMMENT ON COLUMN sessions.completed IS 'Whether the user completed the experien
 -- ============================================================================
 -- LETTERS TABLE
 -- ============================================================================
--- Stores letters written by fefe (author) and nana (recipient)
--- Letters are immutable once created and linked to a specific session
+-- Stores letters written by fefe or nana
+-- Letters are immutable once created and globally accessible to all users
 CREATE TABLE IF NOT EXISTS letters (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-  author TEXT NOT NULL CHECK (author IN ('author', 'recipient')),
+  author TEXT NOT NULL CHECK (author IN ('fefe', 'nana')),
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
   -- Constraints
   CONSTRAINT letters_non_empty_content CHECK (length(trim(content)) > 0),
-  CONSTRAINT letters_valid_author CHECK (author IN ('author', 'recipient'))
+  CONSTRAINT letters_valid_author CHECK (author IN ('fefe', 'nana'))
 );
 
 -- Add comment to letters table
-COMMENT ON TABLE letters IS 'Stores letters written during the experience (author=fefe, recipient=nana)';
+COMMENT ON TABLE letters IS 'Stores letters written during the experience (author=fefe or nana)';
 COMMENT ON COLUMN letters.id IS 'Unique letter identifier';
-COMMENT ON COLUMN letters.session_id IS 'Foreign key to sessions table';
-COMMENT ON COLUMN letters.author IS 'Letter author: author (fefe) or recipient (nana)';
+COMMENT ON COLUMN letters.author IS 'Letter author: fefe or nana';
 COMMENT ON COLUMN letters.content IS 'Letter content text';
 COMMENT ON COLUMN letters.created_at IS 'Letter creation timestamp (immutable)';
 
@@ -56,7 +54,6 @@ COMMENT ON COLUMN letters.created_at IS 'Letter creation timestamp (immutable)';
 -- INDEXES
 -- ============================================================================
 -- Create indexes for better query performance
-CREATE INDEX IF NOT EXISTS idx_letters_session_id ON letters(session_id);
 CREATE INDEX IF NOT EXISTS idx_letters_author ON letters(author);
 CREATE INDEX IF NOT EXISTS idx_letters_created_at ON letters(created_at);
 CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at);
