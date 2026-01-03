@@ -1,10 +1,10 @@
 import { motion } from 'motion/react'
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 
 interface Letter {
   id: string
-  author: 'author' | 'recipient'
+  from: 'fefe' | 'nana'
+  to: 'fefe' | 'nana'
   content: string
   timestamp: number
 }
@@ -13,99 +13,249 @@ interface LettersScreenProps {
   onExit?: () => void
 }
 
+type View = 'list' | 'read' | 'compose'
+
 export function LettersScreen({ onExit }: LettersScreenProps) {
-  const [letters] = useState<Letter[]>([
+  const [letters, setLetters] = useState<Letter[]>([
     {
       id: '1',
-      author: 'author',
+      from: 'fefe',
+      to: 'nana',
       content: 'Esta é uma carta que escrevi para você. Um espaço para expressar o que não consegui dizer de outra forma.',
       timestamp: Date.now(),
     },
   ])
 
+  const [view, setView] = useState<View>('list')
   const [selectedLetterId, setSelectedLetterId] = useState<string | null>(null)
+  const [composeFrom, setComposeFrom] = useState<'fefe' | 'nana'>('fefe')
+  const [composeContent, setComposeContent] = useState('')
+
   const selectedLetter = letters.find((l) => l.id === selectedLetterId)
 
+  const handleCompose = () => {
+    if (!composeContent.trim()) return
+
+    const newLetter: Letter = {
+      id: Date.now().toString(),
+      from: composeFrom,
+      to: composeFrom === 'fefe' ? 'nana' : 'fefe',
+      content: composeContent,
+      timestamp: Date.now(),
+    }
+
+    setLetters([...letters, newLetter])
+    setComposeContent('')
+    setView('list')
+  }
+
   return (
-    <div className="relative w-full h-full flex flex-col">
-      {!selectedLetterId ? (
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="w-full max-w-md"
-          >
-            <h2 className="text-white/80 text-xl mb-8 text-center">
+    <div className="relative w-full h-full flex flex-col bg-neutral-950">
+      {view === 'list' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex-1 flex flex-col items-center justify-center px-6 py-8 overflow-y-auto"
+        >
+          <div className="w-full max-w-2xl">
+            <h2 className="text-white/80 text-2xl mb-2 text-center font-light">
               Cartas
             </h2>
+            <p className="text-white/50 text-sm text-center mb-8">
+              Expressões, não negociações
+            </p>
 
-            <div className="space-y-3">
-              {letters.map((letter) => (
-                <motion.button
-                  key={letter.id}
-                  onClick={() => setSelectedLetterId(letter.id)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full p-4 text-left border border-white/20 rounded-lg hover:border-white/40 transition-colors bg-neutral-900/50"
-                >
-                  <p className="text-white/60 text-sm mb-2">
-                    {letter.author === 'author' ? 'Minha carta' : 'Sua carta'}
-                  </p>
-                  <p className="text-white/80 line-clamp-2">
-                    {letter.content}
-                  </p>
-                </motion.button>
-              ))}
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-white/10">
-              <p className="text-white/50 text-sm text-center mb-4">
-                Cartas são expressões, não negociações.
-              </p>
-              {onExit && (
-                <Button
-                  onClick={onExit}
-                  variant="ghost"
-                  className="w-full text-white/60 hover:text-white/90 border border-white/20 hover:border-white/40"
-                >
-                  sair
-                </Button>
+            <div className="space-y-3 mb-8">
+              {letters.length === 0 ? (
+                <p className="text-white/50 text-center py-8">
+                  Nenhuma carta ainda
+                </p>
+              ) : (
+                letters.map((letter) => (
+                  <motion.button
+                    key={letter.id}
+                    onClick={() => {
+                      setSelectedLetterId(letter.id)
+                      setView('read')
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full p-4 text-left border border-white/20 rounded-sm hover:border-white/40 transition-colors bg-neutral-900/30 hover:bg-neutral-900/50"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-white/60 text-sm font-light">
+                        {letter.from === 'fefe' ? 'fefe' : 'nana'} → {letter.to === 'fefe' ? 'fefe' : 'nana'}
+                      </p>
+                      <p className="text-white/40 text-xs">
+                        {new Date(letter.timestamp).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    <p className="text-white/80 line-clamp-2 font-light">
+                      {letter.content}
+                    </p>
+                  </motion.button>
+                ))
               )}
             </div>
-          </motion.div>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="w-full max-w-md flex flex-col h-full"
-          >
+
+            <div className="space-y-3 pt-6 border-t border-white/10">
+              <motion.button
+                onClick={() => setView('compose')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full px-6 py-3 text-sm font-light tracking-wide text-white/70 hover:text-white/90 border border-white/20 hover:border-white/50 rounded-sm transition-all duration-300"
+              >
+                escrever carta
+              </motion.button>
+
+              {onExit && (
+                <motion.button
+                  onClick={onExit}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-6 py-3 text-sm font-light tracking-wide text-white/50 hover:text-white/70 border border-white/10 hover:border-white/30 rounded-sm transition-all duration-300"
+                >
+                  sair
+                </motion.button>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {view === 'read' && selectedLetter && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex-1 flex flex-col items-center justify-center px-6 py-8 overflow-y-auto"
+        >
+          <div className="w-full max-w-2xl">
             <button
-              onClick={() => setSelectedLetterId(null)}
-              className="text-white/50 hover:text-white/80 text-sm mb-6 transition-colors"
+              onClick={() => setView('list')}
+              className="text-white/50 hover:text-white/80 text-sm mb-8 transition-colors font-light"
             >
               ← voltar
             </button>
 
-            <div className="flex-1 overflow-y-auto">
-              <p className="text-white/60 text-sm mb-4">
-                {selectedLetter?.author === 'author' ? 'Minha carta' : 'Sua carta'}
-              </p>
-              <p className="text-white/80 leading-relaxed whitespace-pre-wrap">
-                {selectedLetter?.content}
-              </p>
+            <div className="bg-neutral-900/30 border border-white/10 rounded-sm p-6 mb-8">
+              <div className="mb-6 pb-6 border-b border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-white/60 text-sm font-light">De:</p>
+                    <p className="text-white/80 font-light">{selectedLetter.from}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/60 text-sm font-light">Para:</p>
+                    <p className="text-white/80 font-light">{selectedLetter.to}</p>
+                  </div>
+                </div>
+                <p className="text-white/40 text-xs font-light">
+                  {new Date(selectedLetter.timestamp).toLocaleDateString('pt-BR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-white/80 leading-relaxed whitespace-pre-wrap font-light">
+                  {selectedLetter.content}
+                </p>
+              </div>
             </div>
 
-            <div className="pt-6 border-t border-white/10 mt-8">
-              <p className="text-white/50 text-xs text-center">
-                {new Date(selectedLetter?.timestamp || 0).toLocaleDateString('pt-BR')}
-              </p>
+            <motion.button
+              onClick={() => setView('list')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full px-6 py-3 text-sm font-light tracking-wide text-white/70 hover:text-white/90 border border-white/20 hover:border-white/50 rounded-sm transition-all duration-300"
+            >
+              voltar
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
+
+      {view === 'compose' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex-1 flex flex-col items-center justify-center px-6 py-8 overflow-y-auto"
+        >
+          <div className="w-full max-w-2xl">
+            <button
+              onClick={() => setView('list')}
+              className="text-white/50 hover:text-white/80 text-sm mb-8 transition-colors font-light"
+            >
+              ← voltar
+            </button>
+
+            <div className="bg-neutral-900/30 border border-white/10 rounded-sm p-6 mb-8">
+              <div className="mb-6 pb-6 border-b border-white/10">
+                <p className="text-white/60 text-sm font-light mb-3">Quem está escrevendo?</p>
+                <div className="flex gap-3">
+                  {(['fefe', 'nana'] as const).map((person) => (
+                    <motion.button
+                      key={person}
+                      onClick={() => setComposeFrom(person)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex-1 px-4 py-2 text-sm font-light rounded-sm transition-all ${
+                        composeFrom === person
+                          ? 'bg-white/10 border border-white/40 text-white/90'
+                          : 'border border-white/20 text-white/60 hover:border-white/40'
+                      }`}
+                    >
+                      {person}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-white/60 text-sm font-light mb-3">
+                  Para: {composeFrom === 'fefe' ? 'nana' : 'fefe'}
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <textarea
+                  value={composeContent}
+                  onChange={(e) => setComposeContent(e.target.value)}
+                  placeholder="Escreva sua carta aqui..."
+                  className="w-full h-48 bg-neutral-800/50 border border-white/20 rounded-sm p-4 text-white/80 placeholder-white/30 font-light focus:outline-none focus:border-white/40 resize-none"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <motion.button
+                  onClick={handleCompose}
+                  disabled={!composeContent.trim()}
+                  whileHover={{ scale: composeContent.trim() ? 1.05 : 1 }}
+                  whileTap={{ scale: composeContent.trim() ? 0.95 : 1 }}
+                  className="w-full px-6 py-3 text-sm font-light tracking-wide text-white/70 hover:text-white/90 border border-white/20 hover:border-white/50 rounded-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  enviar carta
+                </motion.button>
+
+                <motion.button
+                  onClick={() => setView('list')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-6 py-3 text-sm font-light tracking-wide text-white/50 hover:text-white/70 border border-white/10 hover:border-white/30 rounded-sm transition-all duration-300"
+                >
+                  cancelar
+                </motion.button>
+              </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       )}
     </div>
   )
