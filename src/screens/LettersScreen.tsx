@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 interface Letter {
   id: string
@@ -11,42 +12,100 @@ interface Letter {
 
 interface LettersScreenProps {
   onExit?: () => void
+  sessionId?: string
 }
 
 type View = 'list' | 'read' | 'compose'
 
-export function LettersScreen({ onExit }: LettersScreenProps) {
-  const [letters, setLetters] = useState<Letter[]>([
-    {
-      id: '1',
-      from: 'fefe',
-      to: 'nana',
-      content: 'Esta é uma carta que escrevi para você. Um espaço para expressar o que não consegui dizer de outra forma.',
-      timestamp: Date.now(),
-    },
-  ])
-
+export function LettersScreen({ onExit, sessionId }: LettersScreenProps) {
+  const [letters, setLetters] = useState<Letter[]>([])
   const [view, setView] = useState<View>('list')
   const [selectedLetterId, setSelectedLetterId] = useState<string | null>(null)
   const [composeFrom, setComposeFrom] = useState<'fefe' | 'nana'>('fefe')
   const [composeContent, setComposeContent] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const selectedLetter = letters.find((l) => l.id === selectedLetterId)
 
-  const handleCompose = () => {
-    if (!composeContent.trim()) return
+  useEffect(() => {
+    loadLetters()
+  }, [sessionId])
 
-    const newLetter: Letter = {
-      id: Date.now().toString(),
-      from: composeFrom,
-      to: composeFrom === 'fefe' ? 'nana' : 'fefe',
-      content: composeContent,
-      timestamp: Date.now(),
+  const loadLetters = async () => {
+    if (!sessionId) {
+      setLoading(false)
+      return
     }
 
-    setLetters([...letters, newLetter])
-    setComposeContent('')
-    setView('list')
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data, error: err } = await supabase
+        .from('letters')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true })
+
+      if (err) throw err
+
+      const formattedLetters: Letter[] = (data || []).map((letter: any) => ({
+        id: letter.id,
+        from: letter.author === 'author' ? 'fefe' : 'nana',
+        to: letter.author === 'author' ? 'nana' : 'fefe',
+        content: letter.content,
+        timestamp: new Date(letter.created_at).getTime(),
+      }))
+
+      setLetters(formattedLetters)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao carregar cartas'
+      setError(message)
+      console.error('Erro ao carregar cartas:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCompose = async () => {
+    if (!composeContent.trim()) return
+    if (!sessionId) {
+      setError('Sessão não encontrada')
+      return
+    }
+
+    try {
+      setError(null)
+
+      const { data, error: err } = await supabase
+        .from('letters')
+        .insert({
+          session_id: sessionId,
+          author: composeFrom === 'fefe' ? 'author' : 'recipient',
+          content: composeContent,
+        })
+        .select()
+        .single()
+
+      if (err) throw err
+
+      const newLetter: Letter = {
+        id: data.id,
+        from: composeFrom,
+        to: composeFrom === 'fefe' ? 'nana' : 'fefe',
+        content: composeContent,
+        timestamp: new Date(data.created_at).getTime(),
+      }
+
+      setLetters([...letters, newLetter])
+      setComposeContent('')
+      setView('list')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao salvar carta'
+      setError(message)
+      console.error('Erro ao salvar carta:', err)
+    }
   }
 
   return (
@@ -67,8 +126,16 @@ export function LettersScreen({ onExit }: LettersScreenProps) {
             </p>
 
             <div className="space-y-3 mb-8">
-              {letters.length === 0 ? (
-                <p className="text-white/50 text-center py-8">
+              {loading ? (
+                <p className="text-white/50 text-center py-8 font-light">
+                  Carregando cartas...
+                </p>
+              ) : error ? (
+                <p className="text-red-400/70 text-center py-8 font-light text-sm">
+                  {error}
+                </p>
+              ) : letters.length === 0 ? (
+                <p className="text-white/50 text-center py-8 font-light">
                   Nenhuma carta ainda
                 </p>
               ) : (
@@ -232,6 +299,12 @@ export function LettersScreen({ onExit }: LettersScreenProps) {
                   className="w-full h-48 bg-neutral-800/50 border border-white/20 rounded-sm p-4 text-white/80 placeholder-white/30 font-light focus:outline-none focus:border-white/40 resize-none"
                 />
               </div>
+
+              {error && (
+                <div className="mb-6 p-4 bg-red-400/10 border border-red-400/30 rounded-sm">
+                  <p className="text-red-400/70 text-sm font-light">{error}</p>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <motion.button
