@@ -18,7 +18,7 @@ export default function App() {
     if (currentScreen === 7) {
       setCurrentScreen('letters')
     } else if (currentScreen !== 'letters') {
-      setCurrentScreen((prev) => (prev + 1) as ScreenType)
+      setCurrentScreen((prev) => ((prev as number) + 1) as ScreenType)
     }
   }
 

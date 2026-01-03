@@ -14,7 +14,6 @@ export function AnimatedLines({
   delayBetweenLines = 0.3,
   initialDelay = 0.2,
 }: AnimatedLinesProps) {
-  const [isComplete, setIsComplete] = useState(false)
 
   useEffect(() => {
     const totalDuration =

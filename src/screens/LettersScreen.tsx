@@ -14,7 +14,7 @@ interface LettersScreenProps {
 }
 
 export function LettersScreen({ onExit }: LettersScreenProps) {
-  const [letters, setLetters] = useState<Letter[]>([
+  const [letters] = useState<Letter[]>([
     {
       id: '1',
       author: 'author',
