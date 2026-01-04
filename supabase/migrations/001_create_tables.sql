@@ -1,53 +1,40 @@
 -- ============================================================================
--- CADEADO - Database Schema
+-- CADEADO - Database Schema (Clean Rebuild)
 -- ============================================================================
 -- This schema defines the core tables for the emotional experience app
--- Sessions track user journeys, Letters store written messages between fefe/nana
+-- Letters are globally shared between all users
 -- ============================================================================
 
 -- ============================================================================
--- SESSIONS TABLE
+-- DROP ALL EXISTING OBJECTS (Clean slate)
 -- ============================================================================
--- Stores metadata about each user session through the app
--- Each session represents one complete journey through the experience
-CREATE TABLE IF NOT EXISTS sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  completed BOOLEAN DEFAULT FALSE NOT NULL,
-  
-  -- Constraints
-  CONSTRAINT sessions_valid_completed CHECK (completed IN (true, false))
-);
-
--- Add comment to sessions table
-COMMENT ON TABLE sessions IS 'Tracks user sessions through the emotional experience journey';
-COMMENT ON COLUMN sessions.id IS 'Unique session identifier';
-COMMENT ON COLUMN sessions.created_at IS 'Session creation timestamp';
-COMMENT ON COLUMN sessions.updated_at IS 'Last session update timestamp';
-COMMENT ON COLUMN sessions.completed IS 'Whether the user completed the experience';
+DROP POLICY IF EXISTS "letters_allow_public_insert" ON letters;
+DROP POLICY IF EXISTS "letters_allow_public_select" ON letters;
+DROP POLICY IF EXISTS "sessions_allow_public_insert" ON sessions;
+DROP POLICY IF EXISTS "sessions_allow_public_select" ON sessions;
+DROP POLICY IF EXISTS "sessions_allow_public_update" ON sessions;
+DROP TRIGGER IF EXISTS update_sessions_updated_at ON sessions;
+DROP FUNCTION IF EXISTS update_updated_at_column();
+DROP TABLE IF EXISTS letters CASCADE;
+DROP TABLE IF EXISTS sessions CASCADE;
 
 -- ============================================================================
 -- LETTERS TABLE
 -- ============================================================================
 -- Stores letters written by fefe or nana
 -- Letters are immutable once created and globally accessible to all users
--- Drop old table if it exists with session_id column
-DROP TABLE IF EXISTS letters CASCADE;
-
 CREATE TABLE letters (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   author TEXT NOT NULL CHECK (author IN ('fefe', 'nana')),
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   
-  -- Constraints
   CONSTRAINT letters_non_empty_content CHECK (length(trim(content)) > 0),
   CONSTRAINT letters_valid_author CHECK (author IN ('fefe', 'nana'))
 );
 
--- Add comment to letters table
-COMMENT ON TABLE letters IS 'Stores letters written during the experience (author=fefe or nana)';
+-- Add comments to letters table
+COMMENT ON TABLE letters IS 'Stores letters written during the experience (author=fefe or nana). Globally accessible to all users.';
 COMMENT ON COLUMN letters.id IS 'Unique letter identifier';
 COMMENT ON COLUMN letters.author IS 'Letter author: fefe or nana';
 COMMENT ON COLUMN letters.content IS 'Letter content text';
@@ -57,39 +44,14 @@ COMMENT ON COLUMN letters.created_at IS 'Letter creation timestamp (immutable)';
 -- INDEXES
 -- ============================================================================
 -- Create indexes for better query performance
-CREATE INDEX IF NOT EXISTS idx_letters_author ON letters(author);
-CREATE INDEX IF NOT EXISTS idx_letters_created_at ON letters(created_at);
-CREATE INDEX IF NOT EXISTS idx_sessions_created_at ON sessions(created_at);
-CREATE INDEX IF NOT EXISTS idx_sessions_completed ON sessions(completed);
+CREATE INDEX idx_letters_author ON letters(author);
+CREATE INDEX idx_letters_created_at ON letters(created_at DESC);
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================================================
--- Enable RLS on all tables
-ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
+-- Enable RLS on letters table
 ALTER TABLE letters ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies if they exist (for idempotency)
-DROP POLICY IF EXISTS "Allow public to create sessions" ON sessions;
-DROP POLICY IF EXISTS "Allow public to read sessions" ON sessions;
-DROP POLICY IF EXISTS "Allow public to update sessions" ON sessions;
-DROP POLICY IF EXISTS "Allow public to create letters" ON letters;
-DROP POLICY IF EXISTS "Allow public to read letters" ON letters;
-
--- ============================================================================
--- SESSIONS POLICIES
--- ============================================================================
--- Allow anyone to create sessions (no auth required)
-CREATE POLICY "sessions_allow_public_insert" ON sessions
-  FOR INSERT WITH CHECK (true);
-
--- Allow anyone to read all sessions
-CREATE POLICY "sessions_allow_public_select" ON sessions
-  FOR SELECT USING (true);
-
--- Allow anyone to update sessions (mark as completed)
-CREATE POLICY "sessions_allow_public_update" ON sessions
-  FOR UPDATE USING (true);
 
 -- ============================================================================
 -- LETTERS POLICIES
@@ -103,30 +65,10 @@ CREATE POLICY "letters_allow_public_select" ON letters
   FOR SELECT USING (true);
 
 -- ============================================================================
--- FUNCTIONS & TRIGGERS
--- ============================================================================
--- Create function to update updated_at timestamp on sessions
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Create trigger to automatically update updated_at on sessions
-DROP TRIGGER IF EXISTS update_sessions_updated_at ON sessions;
-CREATE TRIGGER update_sessions_updated_at
-  BEFORE UPDATE ON sessions
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
--- ============================================================================
 -- GRANTS
 -- ============================================================================
 -- Grant permissions to anon role (public access)
 GRANT USAGE ON SCHEMA public TO anon;
-GRANT SELECT, INSERT, UPDATE ON sessions TO anon;
 GRANT SELECT, INSERT ON letters TO anon;
 
 -- ============================================================================
