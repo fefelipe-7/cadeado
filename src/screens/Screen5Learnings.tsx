@@ -21,7 +21,7 @@ export function Screen5Learnings({ onContinue }: Screen5LearningsProps) {
       imagePosition: 'right' as const,
     },
     {
-      image: 'https://ibb.co/GfwYk4Bx',
+      image: 'https://i.imgur.com/HH8ynJE_d.webp?maxwidth=760&fidelity=grand',
       text: 'aprendi que amor não se mede em distâncias,\nem litros de lágrimas, em peso de dor\namar é sem medidas',
       imagePosition: 'left' as const,
     },

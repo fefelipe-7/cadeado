@@ -40,7 +40,7 @@ export function Screen6Recognition({ onContinue }: Screen6RecognitionProps) {
           className="flex justify-center"
         >
           <img
-            src="https://ibb.co/wrzv1bwJ"
+            src="https://i.imgur.com/QvipQCs_d.webp?maxwidth=1520&fidelity=grand"
             alt="Us"
             className="w-full max-w-sm h-auto rounded-sm object-cover"
           />
