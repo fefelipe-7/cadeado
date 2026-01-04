@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { ScreenLayout } from '@/components/ScreenLayout'
+import { OptimizedImage } from '@/components/OptimizedImage'
 
 interface Screen5LearningsProps {
   onContinue: () => void
@@ -53,10 +54,12 @@ export function Screen5Learnings({ onContinue }: Screen5LearningsProps) {
             } gap-6 items-center justify-center`}
           >
             <div className="w-40 h-40 flex-shrink-0">
-              <img
+              <OptimizedImage
                 src={section.image}
                 alt={`Learning ${index + 1}`}
                 className="w-full h-full rounded-sm object-cover"
+                width={160}
+                height={160}
               />
             </div>
 

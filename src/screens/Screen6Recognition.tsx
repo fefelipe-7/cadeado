@@ -1,6 +1,7 @@
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { ScreenLayout } from '@/components/ScreenLayout'
+import { OptimizedImage } from '@/components/OptimizedImage'
 
 interface Screen6RecognitionProps {
   onContinue: () => void
@@ -39,7 +40,7 @@ export function Screen6Recognition({ onContinue }: Screen6RecognitionProps) {
           transition={{ duration: 1.0, delay: 0.9 }}
           className="flex justify-center"
         >
-          <img
+          <OptimizedImage
             src="https://i.imgur.com/QvipQCs_d.webp?maxwidth=1520&fidelity=grand"
             alt="Us"
             className="w-full max-w-sm h-auto rounded-sm object-cover"

@@ -32,7 +32,10 @@ COMMENT ON COLUMN sessions.completed IS 'Whether the user completed the experien
 -- ============================================================================
 -- Stores letters written by fefe or nana
 -- Letters are immutable once created and globally accessible to all users
-CREATE TABLE IF NOT EXISTS letters (
+-- Drop old table if it exists with session_id column
+DROP TABLE IF EXISTS letters CASCADE;
+
+CREATE TABLE letters (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   author TEXT NOT NULL CHECK (author IN ('fefe', 'nana')),
   content TEXT NOT NULL,
