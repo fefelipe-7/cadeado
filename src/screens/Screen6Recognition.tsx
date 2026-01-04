@@ -17,13 +17,12 @@ export function Screen6Recognition({ onContinue }: Screen6RecognitionProps) {
     <ScreenLayout
       onContinue={onContinue}
       isAnimating={isAnimating}
-      showButton={false}
     >
-      <div className="w-full max-w-2xl space-y-8">
+      <div className="w-full max-w-2xl space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 1.0, delay: 0.4 }}
           className="text-center"
         >
           <p className="text-white/80 text-xl leading-relaxed font-light mb-4">
@@ -37,11 +36,11 @@ export function Screen6Recognition({ onContinue }: Screen6RecognitionProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 1.0, delay: 0.9 }}
           className="flex justify-center"
         >
           <img
-            src="src/assets/us.png"
+            src="https://ibb.co/wrzv1bwJ"
             alt="Us"
             className="w-full max-w-sm h-auto rounded-sm object-cover"
           />
@@ -50,7 +49,7 @@ export function Screen6Recognition({ onContinue }: Screen6RecognitionProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 1.0, delay: 1.4 }}
           onAnimationComplete={() => setIsAnimating(false)}
           className="text-center"
         >

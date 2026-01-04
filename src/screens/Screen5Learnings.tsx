@@ -11,17 +11,17 @@ export function Screen5Learnings({ onContinue }: Screen5LearningsProps) {
 
   const sections = [
     {
-      image: 'src/assets/1.png',
+      image: 'https://i.ibb.co/Qvgm7nyP/1.png',
       text: 'aprendi que amar não precisar falar\ncarinho e cuidado são atos de amor tão sublimes\nque nos faz pensar que amor também pode ter 4 patas',
       imagePosition: 'left' as const,
     },
     {
-      image: 'src/assets/2.png',
+      image: 'https://i.ibb.co/WWr7RMd0/2.png',
       text: 'aprendi que amar é amar aquilo que o outro ama\ncomo se tivesse sempre amado\ncomo se sempre fosse querido',
       imagePosition: 'right' as const,
     },
     {
-      image: 'src/assets/3.png',
+      image: 'https://ibb.co/GfwYk4Bx',
       text: 'aprendi que amor não se mede em distâncias,\nem litros de lágrimas, em peso de dor\namar é sem medidas',
       imagePosition: 'left' as const,
     },
@@ -35,34 +35,33 @@ export function Screen5Learnings({ onContinue }: Screen5LearningsProps) {
     <ScreenLayout
       onContinue={onContinue}
       isAnimating={isAnimating}
-      showButton={false}
     >
-      <div className="w-full max-w-4xl space-y-12">
+      <div className="w-full max-w-5xl space-y-8">
         {sections.map((section, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 + index * 0.3 }}
+            transition={{ duration: 1.0, delay: 0.4 + index * 0.5 }}
             onAnimationComplete={() => {
               if (index === sections.length - 1) {
                 handleAnimationComplete()
               }
             }}
-            className={`flex flex-col ${
-              section.imagePosition === 'right' ? 'lg:flex-row-reverse' : 'lg:flex-row'
-            } gap-6 lg:gap-8 items-center`}
+            className={`flex ${
+              section.imagePosition === 'right' ? 'flex-row-reverse' : 'flex-row'
+            } gap-6 items-center justify-center`}
           >
-            <div className="w-full lg:w-2/5 flex-shrink-0">
+            <div className="w-40 h-40 flex-shrink-0">
               <img
                 src={section.image}
                 alt={`Learning ${index + 1}`}
-                className="w-full h-auto rounded-sm object-cover"
+                className="w-full h-full rounded-sm object-cover"
               />
             </div>
 
-            <div className="w-full lg:w-3/5">
-              <p className="text-white/80 text-base lg:text-lg leading-relaxed font-light whitespace-pre-line text-center lg:text-left">
+            <div className="flex-1 min-w-0">
+              <p className="text-white/80 text-base leading-relaxed font-light whitespace-pre-line">
                 {section.text}
               </p>
             </div>
